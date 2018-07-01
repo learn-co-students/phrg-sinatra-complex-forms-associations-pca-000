@@ -1,14 +1,21 @@
-require './config/environment'
+# frozen_string_literal: true
+
+require "./config/environment"
 
 if ActiveRecord::Base.connection.migration_context.needs_migration?
-  raise 'Migrations are pending. Run `rake db:migrate` to resolve the issue.'
+  raise "Migrations are pending. Run `rake db:migrate` to resolve the issue."
 end
 
 # auto-add controllers
-Dir[File.join(File.dirname(__FILE__), "app/controllers", "*.rb")].collect {|file| File.basename(file).split(".")[0] }.reject {|file| file == "application_controller" }.each do |file|
-  string_class_name = file.split('_').collect { |w| w.capitalize }.join
+controllers = Dir[File.join(File.dirname(__FILE__), "app/controllers", "*.rb")]
+controllers = controllers.collect { |file| File.basename(file).split(".")[0] }
+controllers = controllers.reject { |file| file == "application_controller" }
+
+controllers.each do |file|
+  string_class_name = file.split("_").collect(&:capitalize).join
   class_name = Object.const_get(string_class_name)
   use class_name
 end
+
 use Rack::MethodOverride
 run ApplicationController
