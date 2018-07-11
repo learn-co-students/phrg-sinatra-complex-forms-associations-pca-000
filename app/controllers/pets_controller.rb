@@ -12,7 +12,7 @@ class PetsController < ApplicationController
 
   post "/pets" do
     @pet = Pet.create(params[:pet])
-    if !params["owner"]["name"].empty?
+    unless params["owner"]["name"].empty?
       @pet.owner = Owner.create(name: params["owner"]["name"])
     end
     @pet.save
@@ -32,7 +32,7 @@ class PetsController < ApplicationController
   post "/pets/:id" do
     @pet = Pet.find_by_id(params[:id])
     @pet.update(params["pet"])
-    if !params["owner"]["name"].empty?
+    unless params["owner"]["name"].empty?
       @pet.owner = Owner.create(name: params["owner"]["name"])
     end
     @pet.save
