@@ -84,9 +84,9 @@ end
 
 ```html
 # views/owners/new.erb
-<%@pets.each do |pet|%>
-    <input type="checkbox" name="owner[pet_ids][]" value="<%=pet.id%>" id="<%=pet.id%>"><%=pet.name%></input>
-<%end%>
+<% @pets.each do |pet| %>
+  <input type="checkbox" name="owner[pet_ids][]" value="<%= pet.id %>" id="<%= pet.id %>"><%= pet.name %></input>
+<% end %>
 ```
 Let's break this down:
 
@@ -100,11 +100,15 @@ The result is a form that looks something like this:
 
 ![](http://readme-pics.s3.amazonaws.com/create-owner-orig.png)
 
-
 Let's place a `binding.pry` in the `post '/owners'` route and submit our form so that we can get a better understanding of the `params` hash we're creating with our form. Once you hit your binding, type `params` in the terminal, and you should see something like this:
 
 ```ruby
-{"owner"=>{"name"=>"Adele", "pet_ids"=>["1", "2"]}}
+{
+  "owner" => {
+    "name" => "Adele",
+    "pet_ids" => ["1", "2"]
+  }
+}
 ```
 
 I filled out my form with a name of "Adele", and I checked the boxes for "Maddy" and "Nona". So, our `params` hash has a key of `"owner"` that points to a value that is a hash containing two keys: `"name"`, with a value of the name entered into the form, and `"pet_ids"`, with a value of an array containing the ids of all of the pets we selected via our checkboxes. Let's move on to writing the code that will create a new owner *and* associate it to these pets.
@@ -114,7 +118,7 @@ I filled out my form with a name of "Adele", and I checked the boxes for "Maddy"
 We are familiar with using mass assignment to create new instances of a class with Active Record. For example, if we had a hash, `owner_info`, that looked like this...
 
 ```ruby
-owner_info = {name: "Adele"}
+owner_info = { name: "Adele" }
 ```
 
 ...we could easily create a new owner like this:
@@ -204,7 +208,15 @@ Note that we've included the section for creating a new pet at the bottom of the
 ...when we submit our form, our `params` hash should look something like this:
 
 ```ruby
-{"owner"=>{"name"=>"Adele", "pet_ids"=>["1", "2"]}, "pet"=>{"name"=>"Fake Pet"}}
+{
+  "owner" => {
+    "name" => "Adele",
+    "pet_ids" => ["1", "2"]
+  },
+  "pet" => {
+    "name"=>"Fake Pet"
+  }
+}
 ```
 
 Our `params["owner"]` hash is unchanged, so `@owner = Owner.create(params["owner"])` still works. But what about creating our new pet with a name of `"Fake Pet"` and associating it to our new owner?
@@ -218,7 +230,15 @@ For this, we'll have to grab the new pet's name from `params["pet"]["name"]`, us
 But, you might be wondering, what if the user *does not* fill out the field to name and create a new pet? In that case, our `params` hash would look like this:
 
 ```ruby
-{"owner"=>{"name"=>"Adele", "pet_ids"=>["1", "2"]}, "pet"=>{"name"=>""}}
+{
+  "owner" => {
+    "name" => "Adele",
+    "pet_ids" => ["1", "2"]
+  },
+  "pet" => {
+    "name" => ""
+  }
+}
 ```
 
 The above line of code would create a new pet with a name of an empty string and associate it to our owner. That's no good. We'll need a way to control whether or not the above line of code runs. Let's create an `if` statement to check whether or not the value of `params["pet"]["name"]` is an empty string.
@@ -258,7 +278,7 @@ Our edit form will be very similar to our create form. We want a user to be able
 Let's do it!
 
 ```html
-# edit.erb
+<!-- edit.erb -->
 <h1>Update Owner</h1>
 
 <form action="/owners/<%=@owner.id%>" method="POST">
@@ -302,11 +322,18 @@ Notice that I've unchecked the first two pets, Maddy and Nona, and checked the n
 My `params` hash consequently looks like this:
 
 ```ruby
-{"owner"=>{"name"=>"Adele", "pet_ids"=>["3", "4"]},
- "pet"=>{"name"=>"Another New Pet"},
- "splat"=>[],
- "captures"=>["8"],
- "id"=>"8"}
+{
+  "owner" => {
+    "name"=>"Adele",
+    "pet_ids" => ["3", "4"]
+  },
+  "pet" => {
+    "name" => "Another New Pet"
+  },
+  "splat" => [],
+  "captures" => ["8"],
+  "id"=>"8"
+}
 ```
 
 #### Updating Owners in the Controller
@@ -343,11 +370,10 @@ And that's it!
 
 ### Creating and Updating Pets with Associated Owners
 
-Now that we've walked through these features together for the `Owner` model, take some time and try to build out the same functionality for `Pet`. The form to create a new pet should allow a user to select from the list of available owners and/or create a new owner, and the form to edit a given pet should allow the user to select a new owner or create a new owner. Note that if a new owner is created it would override any existing owner that is selected. 
+Now that we've walked through these features together for the `Owner` model, take some time and try to build out the same functionality for `Pet`. The form to create a new pet should allow a user to select from the list of available owners and/or create a new owner, and the form to edit a given pet should allow the user to select a new owner or create a new owner. Note that if a new owner is created it would override any existing owner that is selected.
 
 Make sure you run the tests to check your work.
 
 ## Does this need an update?
-Please open a [GitHub issue](https://github.com/learn-co-curriculum/phrg-sinatra-complex-forms-associations/issues) or [pull-request](https://github.com/learn-co-curriculum/phrg-sinatra-complex-forms-associations/pulls). Provide a detailed description that explains the issue you have found or the change you are proposing. Then "@" mention your instructor on the issue or pull-request, and send them a link via Connect.
 
-<p data-visibility='hidden'>PHRG Sinatra and Active Record: Associations and Complex Forms</p>
+Please open a [GitHub issue](https://github.com/learn-co-curriculum/phrg-sinatra-complex-forms-associations/issues) or [pull-request](https://github.com/learn-co-curriculum/phrg-sinatra-complex-forms-associations/pulls). Provide a detailed description that explains the issue you have found or the change you are proposing. Then "@" mention your instructor on the issue or pull-request, and send them a link via Connect.

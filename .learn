@@ -1,7 +1,0 @@
-tags:
-  - sinatra
-  - forms
-languages:
-  - ruby
-
-parent_template: git@github.com:learn-co-curriculum/sinatra-complex-forms-associations.git
