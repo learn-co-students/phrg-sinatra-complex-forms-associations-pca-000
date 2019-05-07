@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# frozen string literal
+
 class PetsController < ApplicationController
   get "/pets" do
     @pets = Pet.all
@@ -11,7 +13,12 @@ class PetsController < ApplicationController
   end
 
   post "/pets" do
-    redirect to "pets/#{@pet.id}"
+    @pet = Pet.create(params[:pet])
+    unless params["owner"]["name"].empty?
+      @pet.owner = Owner.create(name: params["owner"]["name"])
+    end
+    @pet.save
+    redirect "pets/#{@pet.id}"
   end
 
   get "/pets/:id" do
@@ -20,6 +27,17 @@ class PetsController < ApplicationController
   end
 
   post "/pets/:id" do
-    redirect to "pets/#{@pet.id}"
+    @pet = Pet.find(params[:id])
+    @pet.update(params["pet"])
+    unless params["owner"]["name"].empty?
+      @pet.owner = Owner.create(name: params["owner"]["name"])
+    end
+    @pet.save
+    redirect "pets/#{@pet.id}"
+  end
+
+  get "/pets/:id/edit" do
+    @pet = Pet.find(params[:id])
+    erb :'/pets/edit'
   end
 end
